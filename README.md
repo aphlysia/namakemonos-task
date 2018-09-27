@@ -31,3 +31,8 @@ To run on GAE,
 pipenv lock -r 2> /dev/null > requirements.txt
 gcloud app deploy
 ```
+
+
+# Security
+
+This software is not secure: no authentication and no encryption. Don't put any sensitive information.
