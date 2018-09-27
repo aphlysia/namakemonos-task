@@ -18,14 +18,14 @@ git clone https://github.com/aphlysia/namakemonos-task.git
 cd namakemonos-task
 ```
 
-Run locally (but use Google Cloud Datastore),
+To run locally (but use Google Cloud Datastore),
 
 ```
 pipenv install
 pipenv run python main.py
 ```
 
-Run on GAE,
+To run on GAE,
 
 ```
 pipenv lock -r 2> /dev/null > requirements.txt
