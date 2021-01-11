@@ -1,7 +1,7 @@
 class Model:
     def new_task_list(self):
         raise NotImeplementedError
-    def get_task_list(self):
+    def get_tasks(self):
         raise NotImeplementedError
     def add_task(self, name, start_date, interval):
         raise NotImeplementedError
