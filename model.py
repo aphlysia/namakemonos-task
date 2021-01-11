@@ -9,5 +9,9 @@ class Model:
         raise NotImeplementedError
     def remove_task(self, task_list_id, task_id):
         raise NotImeplementedError
+    def pause_task(self, task_list_id, task_id):
+        raise NotImeplementedError
+    def resume_task(self, task_list_id, task_id):
+        raise NotImeplementedError
 
 class UnknownTaskListError(RuntimeError): pass
