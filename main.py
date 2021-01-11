@@ -22,6 +22,8 @@ def task_list(task_list_id):
     for task in tasks:
         task['update_link'] = url_for('update', task_list_id=task_list_id, task_id=task.id)
         task['remove_link'] = url_for('remove', task_list_id=task_list_id, task_id=task.id)
+        task['pause_link'] = url_for('pause', task_list_id=task_list_id, task_id=task.id)
+        task['resume_link'] = url_for('resume', task_list_id=task_list_id, task_id=task.id)
     return render_template(
         'task_list.html', tasks=tasks, task_list_id=task_list_id,
         today=today)
@@ -45,6 +47,16 @@ def update(task_list_id, task_id):
 @app.route('/remove/<int:task_list_id>/<int:task_id>')
 def remove(task_list_id, task_id):
     model.remove_task(task_list_id, task_id)
+    return redirect(url_for('task_list', task_list_id=task_list_id))
+
+@app.route('/pause/<int:task_list_id>/<int:task_id>')
+def pause(task_list_id, task_id):
+    model.pause_task(task_list_id, task_id)
+    return redirect(url_for('task_list', task_list_id=task_list_id))
+
+@app.route('/resume/<int:task_list_id>/<int:task_id>')
+def resume(task_list_id, task_id):
+    model.resume_task(task_list_id, task_id)
     return redirect(url_for('task_list', task_list_id=task_list_id))
 
 

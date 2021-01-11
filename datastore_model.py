@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 from model import *
 from google.cloud import datastore
 
@@ -32,7 +32,7 @@ class DatastoreModel(Model):
         '''
         with self.client.transaction():
             task_list = self.get_task_list(task_list_id)
-            start_date = datetime.datetime(
+            start_date = datetime(
                  year=start_year,
                  month=start_month,
                  day=start_day,
@@ -43,6 +43,7 @@ class DatastoreModel(Model):
                 'name': name,
                 'next_date': start_date,
                 'interval': interval,
+                'status': 'running',
             })
             self.client.put(task)
         return task.key.id
@@ -55,8 +56,8 @@ class DatastoreModel(Model):
     def update_task(self, task_list_id, task_id):
         with self.client.transaction():
             task = self.get_task(task_list_id, task_id)
-            task['next_date'] = datetime.datetime.now()  \
-                + datetime.timedelta(days=task['interval'])
+            task['next_date'] = datetime.now()  \
+                + timedelta(days=task['interval'])
             self.client.put(task)
 
     def remove_task(self, task_list_id, task_id):
@@ -66,9 +67,29 @@ class DatastoreModel(Model):
                 parent=task_list.key)
             self.client.delete(key)
 
+    def pause_task(self, task_list_id, task_id):
+        with self.client.transaction():
+            task = self.get_task(task_list_id, task_id)
+            task['status'] = 'pausing'
+            self.client.put(task)
+
+    def resume_task(self, task_list_id, task_id):
+        with self.client.transaction():
+            task = self.get_task(task_list_id, task_id)
+            task['status'] = 'running'
+            now = datetime.now(timezone.utc)
+            if now > task['next_date']:
+                task['next_date'] = now
+            self.client.put(task)
+
+    def sort(self, tasks):
+        return sorted(tasks, key=lambda e: e['next_date'])
+
     def get_tasks(self, task_list_id):
         task_list_key = self.client.key(self.task_list_kind, task_list_id)
         query = self.client.query(kind=self.task_kind,
             ancestor=task_list_key)
-        return sorted(query.fetch(), key=lambda e: e['next_date'])
-
+        tasks = list(query.fetch())
+        running_tasks = [t for t in tasks if t['status'] != 'pausing']
+        pausing_tasks = [t for t in tasks if t['status'] == 'pausing']
+        return self.sort(running_tasks) + self.sort(pausing_tasks)

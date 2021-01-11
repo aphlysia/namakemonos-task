@@ -8,14 +8,22 @@
 
   <div class="tasks">
   {% for task in tasks %}
-  {% if task['next_date'].date() <= today %}
+  {% if task['status'] != 'pausing' and task['next_date'].date() <= today %}
     <p>
   {% else %}
     <p style="color: #999">
   {% endif %}
+  {% if task['status'] == 'pausing' %}
+      pausing
+  {% endif %}
       {{ task['next_date'].month }}/{{ task['next_date'].day }}
       {{ task['name'] }} / {{ task['interval'] }} day(s)
       <a href="{{ task['update_link'] }}">done</a>
+  {% if task['status'] == 'pausing' %}
+      <a href="{{ task['resume_link'] }}">resume</a>
+  {% else %}
+      <a href="{{ task['pause_link'] }}">pause</a>
+  {% endif %}
       <a href="{{ task['remove_link'] }}" onclick="return confirm('Are you sure you want to remove this item?');">remove</a>
     </p>
   {% endfor %}
