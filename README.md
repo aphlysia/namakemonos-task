@@ -1,4 +1,4 @@
-This is a regular task manager for sloths.
+Task manager for tasks like clearning, watering, and trainnig.
 
 
 # Dependencies
