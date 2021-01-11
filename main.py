@@ -24,6 +24,7 @@ def task_list(task_list_id):
         task['remove_link'] = url_for('remove', task_list_id=task_list_id, task_id=task.id)
         task['pause_link'] = url_for('pause', task_list_id=task_list_id, task_id=task.id)
         task['resume_link'] = url_for('resume', task_list_id=task_list_id, task_id=task.id)
+        task['history_link'] = url_for('history', task_list_id=task_list_id, task_id=task.id)
     return render_template(
         'task_list.html', tasks=tasks, task_list_id=task_list_id,
         today=today)
@@ -41,7 +42,8 @@ def add(task_list_id):
 
 @app.route('/update/<int:task_list_id>/<int:task_id>')
 def update(task_list_id, task_id):
-    model.update_task(task_list_id, task_id)
+    message = ''
+    model.update_task(task_list_id, task_id, message)
     return redirect(url_for('task_list', task_list_id=task_list_id))
 
 @app.route('/remove/<int:task_list_id>/<int:task_id>')
@@ -58,6 +60,12 @@ def pause(task_list_id, task_id):
 def resume(task_list_id, task_id):
     model.resume_task(task_list_id, task_id)
     return redirect(url_for('task_list', task_list_id=task_list_id))
+
+@app.route('/history/<int:task_list_id>/<int:task_id>')
+def history(task_list_id, task_id):
+    histories = model.get_histories(task_list_id, task_id)
+    return render_template(
+        'history.html', histories=histories)
 
 
 if __name__ == '__main__':

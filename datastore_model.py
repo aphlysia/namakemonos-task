@@ -5,6 +5,7 @@ from google.cloud import datastore
 class DatastoreModel(Model):
     task_list_kind = 'task_list'
     task_kind = 'task'
+    history_kind = 'history'
 
     def __init__(self):
         self.client = datastore.Client()
@@ -53,12 +54,22 @@ class DatastoreModel(Model):
         key = self.client.key(self.task_kind, task_id, parent=task_list.key)
         return self.client.get(key)
 
-    def update_task(self, task_list_id, task_id):
+    def update_task(self, task_list_id, task_id, message):
         with self.client.transaction():
             task = self.get_task(task_list_id, task_id)
+            self.add_history(task_id, task, message)
             task['next_date'] = datetime.now()  \
                 + timedelta(days=task['interval'])
             self.client.put(task)
+
+    def add_history(self, task_id, task, message):
+        key = self.client.key(self.history_kind, parent=task.key)
+        history = datastore.Entity(key=key)
+        history.update({
+            'message': message,
+            'time': datetime.now(),
+        })
+        self.client.put(history)
 
     def remove_task(self, task_list_id, task_id):
         with self.client.transaction():
@@ -93,3 +104,17 @@ class DatastoreModel(Model):
         running_tasks = [t for t in tasks if t['status'] != 'pausing']
         pausing_tasks = [t for t in tasks if t['status'] == 'pausing']
         return self.sort(running_tasks) + self.sort(pausing_tasks)
+
+    def get_histories(self, task_list_id, task_id):
+        task = self.get_task(task_list_id, task_id)
+        '''
+        key = self.client.key(self.history_kind,
+            {'task_list': task_list_id, 'task': task_id},
+            parent=task.key)
+        '''
+        #key = self.client.key(self.task_kind, task_id)
+        #key = self.client.key(self.task_kind, task_id, parent=task_list.key)
+        query = self.client.query(kind=self.history_kind,
+            ancestor=task.key)
+        histories = list(query.fetch())
+        return sorted(histories, key=lambda e: e['time'], reverse=True)

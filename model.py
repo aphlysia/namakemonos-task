@@ -13,5 +13,7 @@ class Model:
         raise NotImeplementedError
     def resume_task(self, task_list_id, task_id):
         raise NotImeplementedError
+    def get_histories(self, task_list_id, task_id):
+        raise NotImeplementedError
 
 class UnknownTaskListError(RuntimeError): pass

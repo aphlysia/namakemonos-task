@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <title>Namakemonos task</title>
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="histories">
+  {{ histories|length }} times
+  {% for h in histories %}
+    <p>
+    {{ h['time'].strftime('%Y/%m/%d %H:%M') }} {{ h['message'] }}
+    </p>
+  {% endfor %}
+  </div>
+
+</body>
+</html>

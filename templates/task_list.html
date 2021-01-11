@@ -24,6 +24,7 @@
   {% else %}
       <a href="{{ task['pause_link'] }}">pause</a>
   {% endif %}
+      <a href="{{ task['history_link'] }}">history</a>
       <a href="{{ task['remove_link'] }}" onclick="return confirm('Are you sure you want to remove this item?');">remove</a>
     </p>
   {% endfor %}
